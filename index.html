@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>VOID_ARCHIVE // LAPIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;700&display=swap');
+
+        :root {
+            --glitch-color: #ff0000;
+            --primary: #d1d1d1;
+            --bg: #050505;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--primary);
+            font-family: 'JetBrains+Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Тот самый иммерсивный фон */
+        .viewport-background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png'), 
+                        radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            opacity: 0.4;
+            z-index: -1;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Glitch Animation */
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 2px;
+            text-shadow: -1px 0 red;
+            top: 0;
+            background: var(--bg);
+            overflow: hidden;
+            clip: rect(0, 900px, 0, 0);
+            animation: noise-anim 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes noise-anim {
+            0% { clip: rect(10px, 9999px, 20px, 0); }
+            100% { clip: rect(80px, 9999px, 90px, 0); }
+        }
+
+        .terminal-window {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .scan-line {
+            width: 100%;
+            height: 100px;
+            z-index: 99;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { bottom: 100%; }
+            100% { bottom: -100%; }
+        }
+
+        .sidebar-link:hover {
+            background: #1a1a1a;
+            color: #fff;
+            padding-left: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .morse-block {
+            word-break: break-all;
+            letter-spacing: 2px;
+            line-height: 1.8;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="viewport-background"></div>
+    <div class="scan-line"></div>
+
+    <div class="max-w-7xl mx-auto h-full flex flex-col border border-white/10 relative overflow-hidden">
+        
+        <header class="border-b border-white/10 p-4 flex justify-between items-center bg-black/50">
+            <div class="flex items-center gap-4">
+                <span class="text-xs opacity-50">STATUS: <span class="text-green-500">CONNECTED</span></span>
+                <span class="text-xs opacity-50">NODE: VZAIDKOST_01</span>
+            </div>
+            <div class="glitch font-bold tracking-widest text-sm" data-text="LAPIN SYSTEM v1.0">LAPIN SYSTEM v1.0</div>
+            <div class="text-xs opacity-50" id="clock">00:00:00</div>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden">
+            <nav class="w-64 border-r border-white/10 p-6 flex flex-col gap-4 bg-black/20 overflow-y-auto">
+                <div class="text-[10px] uppercase tracking-tighter opacity-30 mb-2 font-bold">Directories</div>
+                <a href="#vzaidkost" class="sidebar-link text-sm opacity-60">root/vzaidkost</a>
+                <a href="#murmure-de-vide" class="sidebar-link text-sm opacity-60">root/murmure-de-vide</a>
+                <a href="#ili" class="sidebar-link text-sm opacity-60">root/ili</a>
+                <a href="#foryouhaaa" class="sidebar-link text-sm opacity-60">root/foryouhaaa</a>
+                <a href="#limite" class="sidebar-link text-sm opacity-60">root/limite</a>
+                
+                <div class="mt-auto pt-4 border-t border-white/10">
+                    <a href="#mirror" class="text-xs text-red-900 hover:text-red-500 transition-colors uppercase font-bold tracking-widest">
+                        [ ! ] decryptor
+                    </a>
+                </div>
+            </nav>
+
+            <main class="flex-1 overflow-y-auto p-8 relative" id="content-area">
+                <div id="view-container" class="max-w-2xl mx-auto opacity-0 transition-opacity duration-700">
+                    </div>
+            </main>
+        </div>
+
+        <footer class="border-t border-white/10 p-2 text-[9px] flex justify-between px-6 bg-black/80">
+            <div class="opacity-30 uppercase">User: Identified // Access: Full</div>
+            <div class="opacity-30 uppercase tracking-widest">Everything you take is a shadow</div>
+        </footer>
+    </div>
+
+    <script>
+        const DATA = {
+            'vzaidkost': {
+                title: 'LAPIN // STARTING_POINT',
+                content: `
+                    <div class="mb-8 border-l-2 border-white/20 pl-4 py-2 italic opacity-80">
+                        "You say I took everything? I only took your mask. Beneath it, there was nothing but a broken doll."
+                    </div>
+                    <div class="space-y-6 text-sm leading-relaxed">
+                        <p>Welcome home, @vzaidkost. The cage is still open.</p>
+                        <p class="text-xl font-bold tracking-tighter border-y border-white/5 py-4">TRY GOING TO THE OLD CHANNEL @VZAIDKOST.</p>
+                        <p>You like games, don't you? Let's see if your intellect matches your ambition. Here is your mirror, broken down into signals.</p>
+                    </div>
+                `
+            },
+            'murmure-de-vide': {
+                title: 'ARCHIVE_OF_UNHAPPENED',
+                content: `
+                    <div class="space-y-4 text-xs md:text-sm whitespace-pre-line opacity-90">
+                        здесь правда — не в строчках, а в паузе меж них,
+                        где эхо без голоса стелется в тишь.
+                        не место, а след от несказанных слов,
+                        что таял во мгле, не дойдя до основ.
+
+                        ты ищешь названья? его тут не жди,
+                        оно растворилось в безликой груди...
+                    </div>
+                `
+            },
+            'mirror': {
+                title: 'MIRROR_DECRYPTOR_#1788',
+                content: `
+                    <div class="bg-red-900/10 border border-red-900/30 p-4 mb-6">
+                        <span class="text-red-500 text-[10px] font-bold uppercase tracking-widest">System Alert: encrypted_data_detected</span>
+                    </div>
+                    <div class="morse-block text-xs mb-8 p-4 bg-black/40 border border-white/5" id="morse-src">
+                        - .... .. ... / .. ... / -. --- - / .- / -.. .-. . .- -- / ... --- -- . / --- -. . / .. ... / .-- .- - -.-. .... .. -. --. / -.-- --- ..- / .-.. .- .--. .. -.
+                    </div>
+                    <button onclick="decrypt()" id="btn-dec" class="border border-white/20 px-6 py-2 text-xs uppercase hover:bg-white hover:text-black transition-all">
+                        Execute Decryption
+                    </button>
+                    <div id="dec-result" class="mt-8 text-lg font-bold tracking-widest text-white hidden"></div>
+                `
+            }
+        };
+
+        function renderView() {
+            const hash = window.location.hash.replace('#', '') || 'vzaidkost';
+            const container = document.getElementById('view-container');
+            const data = DATA[hash] || DATA['vzaidkost'];
+
+            container.classList.remove('opacity-100');
+            container.classList.add('opacity-0');
+
+            setTimeout(() => {
+                container.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-10 tracking-tighter uppercase glitch" data-text="${data.title}">${data.title}</h2>
+                    ${data.content}
+                `;
+                container.classList.remove('opacity-0');
+                container.classList.add('opacity-100');
+            }, 300);
+        }
+
+        function decrypt() {
+            const res = document.getElementById('dec-result');
+            const btn = document.getElementById('btn-dec');
+            btn.innerHTML = "Processing...";
+            
+            setTimeout(() => {
+                res.innerHTML = "THIS IS NOT A DREAM. SOMEONE IS WATCHING YOU, LAPIN.";
+                res.classList.remove('hidden');
+                btn.style.display = 'none';
+            }, 2000);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
+        }
+
+        window.addEventListener('hashchange', renderView);
+        window.onload = () => {
+            renderView();
+            setInterval(updateClock, 1000);
+        };
+    </script>
+</body>
+</html>
