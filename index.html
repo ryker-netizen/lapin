@@ -105,6 +105,11 @@
         }
     </style>
 </head>
+    
+    <div id="boot-screen">
+        <div id="boot-log" class="text-xs md:text-sm"></div>
+    </div>
+ 
 <body class="p-4 md:p-8">
 
     <div class="viewport-background"></div>
@@ -194,6 +199,17 @@
                 `
             }
         };
+
+                function initBoot() {
+            const log = document.getElementById('boot-log');
+            const lines = [
+                "> INITIALIZING LAPIN_OS v.1.0...",
+                "> LOADING CORE MODULES...",
+                "> ACCESSING ENCRYPTED_FILES/VZAIDKOST...",
+                "> CONNECTION ESTABLISHED: 127.0.0.1",
+                "> WARNING: MIRROR_LEAK DETECTED",
+                "> DECODING ARCHIVE..."
+            ];
 
         function renderView() {
             const hash = window.location.hash.replace('#', '') || 'vzaidkost';
